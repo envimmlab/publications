@@ -74,8 +74,21 @@
        margin: 0 auto;
        padding-top: 50px;	     
      }
-    </style> 
-	
+     .text p a.paper-link {
+       color: inherit;
+       text-decoration: none;
+       display: block;
+       border-radius: 4px;
+       padding: 4px 6px;
+       margin: -4px -6px;
+       transition: background-color 0.2s, color 0.2s;
+     }
+     .text p a.paper-link:hover {
+       background-color: #eef5ff;
+       color: #0f6efc;
+     }
+    </style>
+
 </head>
 
 
@@ -190,7 +203,27 @@ in Korea (KROG 16-02). Breast Cancer Res Treat. 2017 Feb;162(1):77-83. doi: 10.1
 <h2>2014</h2>
 <p>Kim HS, Hwang Y, Lee JH, Oh HY, Kim YJ, Kwon HY, Kang H, Kim H, Park RW, Kim JH. Future prospects of health management systems using cellular phones. Telemed J E Health. 2014 Jun;20(6):544-51. doi: 10.1089/tmj.2013.0271. Epub 2014 Apr 2. PMID: 24693986; PMCID: PMC4038983.</p>	
 	</div>
-	
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.text p').forEach(function(p) {
+        var html = p.innerHTML;
+        var doiMatch = html.match(/doi:\s*(10\.[^\s,;]+)/i);
+        if (doiMatch) {
+            var doi = doiMatch[1].replace(/[.)\]]+$/, '');
+            var url = 'https://doi.org/' + doi;
+            var a = document.createElement('a');
+            a.href = url;
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer';
+            a.className = 'paper-link';
+            a.innerHTML = html;
+            p.innerHTML = '';
+            p.appendChild(a);
+        }
+    });
+});
+</script>
 
 </body>
 
