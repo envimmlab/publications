@@ -87,6 +87,14 @@
        background-color: #eef5ff;
        color: #0f6efc;
      }
+     .text p strong {
+       font-weight: bold;
+     }
+     .co-role {
+       font-style: italic;
+       color: #555;
+       font-size: 0.9em;
+     }
     </style>
 
 </head>
@@ -208,6 +216,35 @@ in Korea (KROG 16-02). Breast Cancer Res Treat. 2017 Feb;162(1):77-83. doi: 10.1
 document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.text p').forEach(function(p) {
         var html = p.innerHTML;
+
+        // --- Bold Kim YJ with co-role annotations ---
+        var PH = '\x01KIMYJ\x01';
+        html = html.split('Kim YJ').join(PH);
+
+        // Case 1: Kim YJ immediately before a co-corresponding annotated last author
+        // e.g. "Kim YJ, Kim JH (co-corresponding author)"
+        html = html.replace(
+            /\x01KIMYJ\x01(, [A-Za-z]+ [A-Za-z]+ \(co-corresponding author\))/g,
+            '<strong>Kim YJ</strong> <span class="co-role">(co-corresponding author)</span>$1'
+        );
+
+        // Case 2: Kim YJ directly annotated with co-role
+        // e.g. "Kim YJ (co-corresponding author)" or "Kim YJ (co-1st author)"
+        html = html.replace(
+            /\x01KIMYJ\x01\s*(\(co-(?:corresponding|1st) author[^)]*\))/gi,
+            '<strong>Kim YJ</strong> <span class="co-role">$1</span>'
+        );
+
+        // Case 3: Kim YJ as sole corresponding author – keep annotation, just bold name
+        html = html.replace(
+            /\x01KIMYJ\x01\s*(\(corresponding author\))/gi,
+            '<strong>Kim YJ</strong> $1'
+        );
+
+        // Case 4: all remaining occurrences
+        html = html.split(PH).join('<strong>Kim YJ</strong>');
+
+        // --- Wrap in DOI link ---
         var doiMatch = html.match(/doi:\s*(10\.[^\s,;]+)/i);
         if (doiMatch) {
             var doi = doiMatch[1].replace(/[.)\]]+$/, '');
@@ -220,6 +257,8 @@ document.addEventListener('DOMContentLoaded', function() {
             a.innerHTML = html;
             p.innerHTML = '';
             p.appendChild(a);
+        } else {
+            p.innerHTML = html;
         }
     });
 });
